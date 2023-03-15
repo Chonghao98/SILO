@@ -1,6 +1,6 @@
 # SILO:Detection-of-short-identity-by-descent-by-incorporating-low-frequency-variants
 SILO is an IBD detection method that is capable of identifying short IBD segments.
-# The hyperparameters of SILO:
+# The hyperparameters of SILO
 --winsize (or -w, type=int): the window size.  
 --length (or -l, type=float): the length of block.  
 --error_common (or -ec, type=float): the genotype error of common variants.  
@@ -21,3 +21,18 @@ SILO is an IBD detection method that is capable of identifying short IBD segment
 --test_common (type=str): the path and filename (prefix) of common variants in the test set.  
 --test_lowf (type=str): the path and filename (prefix) of low-frequency variants in the test set.  
 --output (type=str): the path and filename (prefix) of output.  
+# Getting started
+Below is an example for running SILO:
+```
+python3 run_SILO.py 
+--winsize 10  
+--length 3  
+--error_common 0.005  
+--error_lowf 1e-5  
+--threads 10  
+--train_common /PATH(COMMON VARIANTS IN TRAINING SET)  
+--train_lowf /PATH(LOW FREQUENCY VARIANTS IN TRAINING SET)  
+--test_common /PATH(COMMON VARIANTS IN TESTING SET)  
+--test_lowf /PATH(LOW FREQUENCY VARIANTS IN TESTING SET)  
+--output /PATH(OUTPUT)  
+```
