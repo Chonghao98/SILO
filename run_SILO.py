@@ -11,7 +11,7 @@ import sys
 parser = argparse.ArgumentParser()
 parser.add_argument("-w","--winsize",type=int,help="the window size")
 parser.add_argument("-l","--length",type=float,help="the length of block")
-parser.add_argument("-ec","--error_common",type=float,help="the genotype error of common variants")
+parser.add_argument("-ec","--error_common",type=float,default=0.005,help="the genotype error of common variants")
 parser.add_argument("-el","--error_lowf",type=float,default=1e-5,help="the genotype error of low-frequency variants")
 parser.add_argument("-t","--threshold",type=float,default=3,help="the threshold for LLR score")
 parser.add_argument("--mode",type=str,help="Input 'inner' or 'outer', which stands for computing inner log-likelihood ratio or computing outer log-likelihood ratio, respectively",default='outer')
@@ -24,10 +24,10 @@ parser.add_argument("--negative_ratio_thres",type=float,default=1/10,help="the t
 parser.add_argument("--negative_count_thres",type=int,default=1,help="the threshold for the negative count in generating IBD regions based on low frequency variants")
 parser.add_argument("--pseudo",type=float,default=0.01,help="the pseudo-count used in empirical distribution for smoothing")
 parser.add_argument("--threads",type=int,default=10,help="the number of threads used")
-parser.add_argument("--train_common",type=str,help="the path and filename (prefix) of common variants in the training set")
-parser.add_argument("--train_lowf",type=str,help="the path and filename (prefix) of low-frequency variants in the training set")
-parser.add_argument("--test_common",type=str,help="the path and filename (prefix) of common variants in the test set")
-parser.add_argument("--test_lowf",type=str,help="the path and filename (prefix) of low-frequency variants in the test set")
+parser.add_argument("--train_common",type=str,help="the path and filename (prefix) of common variants of the training set")
+parser.add_argument("--train_lowf",type=str,help="the path and filename (prefix) of low-frequency variants of the training set")
+parser.add_argument("--test_common",type=str,help="the path and filename (prefix) of common variants of the test set")
+parser.add_argument("--test_lowf",type=str,help="the path and filename (prefix) of low-frequency variants of the test set")
 parser.add_argument("--output",type=str,help="the path and filename (prefix) of output")
 args = parser.parse_args()
 
@@ -42,6 +42,7 @@ error_common = args.error_common
 error_lowf = args.error_lowf
 
 hap = pd.read_csv('{}.hap'.format(args.train_common),sep=' ')
+hap.replace(-1,1,inplace=True) # convert missing values to 1 (major allele)
 common_tped = pd.read_csv('{}.tped'.format(args.test_common),sep=' +',engine='python',header=None)
 tfam = pd.read_csv('{}.tfam'.format(args.test_common),sep=' ',header=None)
 common_frq = pd.read_csv('{}.frq'.format(args.train_common),sep=' +',engine='python')
