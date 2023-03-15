@@ -1,4 +1,4 @@
-# SILO: Detection-of-short-identity-by-descent-by-incorporating-low-frequency-variants
+# SILO
 SILO is an IBD detection method that is capable of identifying short IBD segments.
 # The hyperparameters of SILO
 --winsize (or -w, type=int): the window size.  
