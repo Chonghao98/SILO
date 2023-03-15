@@ -46,7 +46,7 @@ haplotype1 haplotype2 haplotype3 haplotype4
 1 1 1 0
 0 0 -1 1
 ```
-'0' stands for the minor allele, and '1' stands for the major allele. '-1' stabds for the missing value. Each column in the .hap is a haplotype. The first two columns are the haplotypes for the first person, and the third and fourth columns are the haplotypes for the second person. Each row is a SNP, the corresponding order is the same as the order in .map file. Each column is seperated by a space. 
+'0' stands for the minor allele, and '1' stands for the major allele. '-1' stands for the missing value. Each column in the .hap is a haplotype. The first two columns are the haplotypes for the first person, and the third and fourth columns are the haplotypes for the second person. The first row is the haplotype name, and the remaining rows stand for SNPs. The corresponding order of these remaining rows is the same as the order in .map file. Each column is seperated by a space. 
 ## Getting started
 Download the IBD_functions.py and run_SILO.py and put them in one folder. run_SILO.py will load the functions defined in IBD_functions.py.  
 Below is an example for running SILO:
