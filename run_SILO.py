@@ -9,8 +9,8 @@ import argparse
 import sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-w","--winsize",type=int,help="the window size")
-parser.add_argument("-l","--length",type=float,help="the length of block")
+parser.add_argument("-w","--winsize",type=int,default=10,help="the window size")
+parser.add_argument("-l","--length",type=float,default=3,help="the length of block")
 parser.add_argument("-ec","--error_common",type=float,default=0.005,help="the genotype error of common variants")
 parser.add_argument("-el","--error_lowf",type=float,default=1e-5,help="the genotype error of low-frequency variants")
 parser.add_argument("-t","--threshold",type=float,default=3,help="the threshold for LLR score")
@@ -18,17 +18,18 @@ parser.add_argument("--mode",type=str,help="Input 'inner' or 'outer', which stan
 parser.add_argument("--union",type=int,help="calculate scores for low frequency variants of a pair of individuals that 1. either one carries minor alleles or 2. both two individuals carry minor alleles. Input 1 for case 1, or 2 for case 2",default=2)
 parser.add_argument("--density",type=float,help="the minimum number of common SNPs in a block length of 1 cM",default=125)
 parser.add_argument("--bin_length",type=float,help="the length of bins",default=2)
-parser.add_argument("--N_simIBD",type=int,default=1000,help="the number of simulated IBD pairs")
-parser.add_argument("--N_simnonIBD",type=int,default=1000,help="the number of simulated non-IBD pairs")
-parser.add_argument("--negative_ratio_thres",type=float,default=1/10,help="the threshold for the negative ratio in generating IBD regions based on low frequency variants")
+parser.add_argument("--N_simIBD",type=int,default=800,help="the number of simulated IBD pairs")
+parser.add_argument("--N_simnonIBD",type=int,default=800,help="the number of simulated non-IBD pairs")
+parser.add_argument("--negative_ratio_thres",type=float,default=0.1,help="the threshold for the negative ratio in generating IBD regions based on low frequency variants")
 parser.add_argument("--negative_count_thres",type=int,default=1,help="the threshold for the negative count in generating IBD regions based on low frequency variants")
 parser.add_argument("--pseudo",type=float,default=0.01,help="the pseudo-count used in empirical distribution for smoothing")
 parser.add_argument("--threads",type=int,default=10,help="the number of threads used")
-parser.add_argument("--train_common",type=str,help="the path and filename (prefix) of common variants of the training set")
-parser.add_argument("--train_lowf",type=str,help="the path and filename (prefix) of low-frequency variants of the training set")
-parser.add_argument("--test_common",type=str,help="the path and filename (prefix) of common variants of the test set")
-parser.add_argument("--test_lowf",type=str,help="the path and filename (prefix) of low-frequency variants of the test set")
-parser.add_argument("--output",type=str,help="the path and filename (prefix) of output")
+requiredNamed = parser.add_argument_group('required arguments')
+requiredNamed.add_argument("--train_common",type=str,help="the path and filename (prefix) of common variants of the training set",required=True)
+requiredNamed.add_argument("--train_lowf",type=str,help="the path and filename (prefix) of low-frequency variants of the training set",required=True)
+requiredNamed.add_argument("--test_common",type=str,help="the path and filename (prefix) of common variants of the test set",required=True)
+requiredNamed.add_argument("--test_lowf",type=str,help="the path and filename (prefix) of low-frequency variants of the test set",required=True)
+requiredNamed.add_argument("--output",type=str,help="the path and filename (prefix) of output",required=True)
 args = parser.parse_args()
 
 
@@ -51,6 +52,7 @@ lowf_frq = pd.read_csv('{}.frq'.format(args.train_lowf),sep=' +',engine='python'
 lowf_frq_counts = pd.read_csv('{}.frq.counts'.format(args.train_lowf),sep=' +',engine='python')
 df_map = pd.read_csv('{}.map'.format(args.train_common),sep='\t',header=None)
 lowf_map = pd.read_csv('{}.map'.format(args.train_lowf),sep='\t',header=None)
+
 win_size = args.winsize
 num_nodes = args.threads
 epsilon_common = float(error_common)
@@ -144,7 +146,6 @@ score_set = []
 tmp_res_set = []
 num_hap_training = len(hap.columns)
 for i in range(len(pair_set)):
-#    print('Whole pairs: ',len(pair_set),', now: ',i)
     indi_1_index = pair_set[i][0]
     indi_2_index = pair_set[i][1]
     win_lowf_dic = allocate_rare2win(indi_1_index,indi_2_index,index_minor_dic,lowf_tped,df_pos,union)
@@ -170,9 +171,6 @@ for i in range(len(pair_set)):
         if args.mode == 'inner':
             result = pool.apply_async(compute_score_v1,(common_geno_1_set,common_geno_2_set,win_freq,minor_set_train,major_set_train,minor_set_test,major_set_test,epsilon_common,epsilon_lowf,num_hap_training,lowf_SNP_set,lowf_geno_1_set,lowf_geno_2_set,judge_lowf,))
         elif args.mode == 'outer':
-#            df_empi_IBD = df_empi_IBD_whole.iloc[j,:]
-#            df_empi_IBD = df_empi_IBD_whole.iloc[j*2:(j+1)*2,:]
-#            df_empi_nonIBD = df_empi_nonIBD_whole.iloc[j*2:(j+1)*2,:]
             df_empi_IBD = df_empi_IBD_whole.iloc[j*num_bin:(j+1)*num_bin,:]
             df_empi_nonIBD = df_empi_nonIBD_whole.iloc[j*num_bin:(j+1)*num_bin,:]
             result = pool.apply_async(compute_score_v2,(df_empi_IBD,df_empi_nonIBD,common_geno_1_set,common_geno_2_set,win_freq,minor_set_train,major_set_train,minor_set_test,major_set_test,epsilon_common,epsilon_lowf,num_hap_training,lowf_SNP_set,lowf_geno_1_set,lowf_geno_2_set,judge_lowf,))
