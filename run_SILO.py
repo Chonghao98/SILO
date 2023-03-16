@@ -57,7 +57,7 @@ win_size = args.winsize
 num_nodes = args.threads
 epsilon_common = float(error_common)
 epsilon_lowf = float(error_lowf)
-LOD_threshold = args.threshold
+LLR_threshold = args.threshold
 length = args.length # block length
 num_markers = len(common_tped.index)
 print('Generating windows')
@@ -129,9 +129,6 @@ if args.mode == 'outer':
     diff_outer2 = inter_time_outer2-inter_time_outer1
     print('Time spent for generating empirical distribution: ',diff_outer2)
 
-    df_empi_IBD_whole.to_csv('{}_empirical_IBD.txt'.format(args.output),sep='\t',index=False)
-    df_empi_nonIBD_whole.to_csv('{}_empirical_nonIBD.txt'.format(args.output),sep='\t',index=False)
-
 index_sample = list(range(len(tfam.index))) # the column indexes of all samples in the tped file
 pair_set = list(itertools.combinations(index_sample,2)) # the list of all possible pairs
 
@@ -191,7 +188,7 @@ df[2] = window_index_set
 df[3] = common_score_set
 df[4] = lowf_score_set
 df[5] = score_set
-df.columns = ['indi_1','indi_2','window index','common_score','lowf_score','LOD']
+df.columns = ['indi_1','indi_2','window_index','common_score','lowf_score','LLR']
 df.to_csv('{}_window_scores.txt'.format(args.output),sep='\t',index=False)
 
 inter_time3 = time.time()
@@ -231,7 +228,7 @@ new_df[1] = indi_2_set
 new_df[2] = block_index_set
 new_df[3] = block_windows_set
 new_df[4] = block_common_score_set
-new_df.columns = ['indi_1','indi_2','block index','window index','common_score']
+new_df.columns = ['indi_1','indi_2','block_index','window_index','common_score']
 new_df.to_csv('{}_block_scores.txt'.format(args.output),sep='\t',index=False)
 
 inter_time4 = time.time()
@@ -253,7 +250,7 @@ for i in range(len(pair_set)):
     index4 = df.index[df.loc[:,'indi_2']==indi_2]
     index_inter = sorted(list(set(index3).intersection(set(index4))))
     sub_df_window = df.loc[index_inter,:]
-    result = pool.apply_async(generate_IBD_region,(sub_new_df,sub_df_window,windows_set,df_map,lowf_map,LOD_threshold,args.negative_ratio_thres,args.negative_count_thres,))
+    result = pool.apply_async(generate_IBD_region,(sub_new_df,sub_df_window,windows_set,df_map,lowf_map,LLR_threshold,args.negative_ratio_thres,args.negative_count_thres,))
     tmp_res_set.append(result)
 pool.close()
 pool.join()

@@ -1252,7 +1252,7 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
     # windows_set: the list of windows in which associated markers are
     # common_map: the .map file of common SNPs
     # rare_map: the .map file of rare SNPs
-    # threshold: the threshold for LOD score
+    # threshold: the threshold for LLR score
     # negative_ratio_thres: the threshold for the negative_ratio
     # negative_count_thres: the threshold for the negative_count
     # Output:
@@ -1267,7 +1267,7 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
         end_pos_set = []
     else:
         check_IBD = 1
-        windows_index_IBD_set = list(df_block_score.loc[index,'window index'].values)
+        windows_index_IBD_set = list(df_block_score.loc[index,'window_index'].values)
         windows_index_IBD_set = np.array(sorted(list(set(chain(*windows_index_IBD_set))))) # the list of windows that are in IBD regions
         # get the boundary of each consecutive windows region
         tmp_windows_index = windows_index_IBD_set[1:]
@@ -1428,7 +1428,7 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
         for i in range(len(index_set)):
             index = list(index_set)[i]
             if index not in index_store_set:
-                lod = df_window_score.loc[index,'LOD']
+                llr = df_window_score.loc[index,'LLR']
                 index_left = index
                 index_right = index
                 index_store_set.append(index)
@@ -1437,7 +1437,7 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
                 else:
                     negative_count = 0
                 all_count = 1
-                while lod >= threshold:
+                while llr >= threshold:
                     region_start_cm_pos = common_map.iloc[windows_set[index_left][0],2]
                     region_end_cm_pos = common_map.iloc[windows_set[index_right][-1],2]
                     region_length = region_end_cm_pos-region_start_cm_pos
@@ -1446,11 +1446,11 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
                         if index_left > 0 and index_right < len(df_window_score.index)-1:
                             index_left = index_left-1
                             index_right = index_right+1
-                            left_lod = df_window_score.loc[index_left,'LOD']
-                            right_lod = df_window_score.loc[index_right,'LOD']
-                            new_lod = lod+left_lod+right_lod
-                            if new_lod >= threshold and left_lod >= -3 and right_lod >= -3:
-                                lod = new_lod
+                            left_llr = df_window_score.loc[index_left,'LLR']
+                            right_llr = df_window_score.loc[index_right,'LLR']
+                            new_llr = llr+left_llr+right_llr
+                            if new_llr >= threshold and left_llr >= -3 and right_llr >= -3:
+                                llr = new_llr
                                 index_store_set.append(index_left)
                                 index_store_set.append(index_right)
                                 if df_window_score.loc[index_left,'common_score'] < 0:
@@ -1459,33 +1459,33 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
                                     negative_count += 1
                                 all_count += 2
                             else:
-                                new_lod = lod+left_lod
-                                if new_lod >= threshold and left_lod >= -3:
-                                    lod = new_lod
+                                new_llr = llr+left_llr
+                                if new_llr >= threshold and left_llr >= -3:
+                                    llr = new_llr
                                     index_store_set.append(index_left)
                                     if df_window_score.loc[index_left,'common_score'] < 0:
                                         negative_count += 1
                                     all_count += 1
-                                    index_right = index_right-1 # here it is to avoid the expansion of the right direction when adding the LOD score of the right window does not exceed the threshold
+                                    index_right = index_right-1 # here it is to avoid the expansion of the right direction when adding the llr score of the right window does not exceed the threshold
                                 else:
-                                    new_lod = lod+right_lod
-                                    if new_lod >= threshold and right_lod >= -3:
-                                        lod = new_lod
+                                    new_llr = llr+right_llr
+                                    if new_llr >= threshold and right_llr >= -3:
+                                        llr = new_llr
                                         index_store_set.append(index_right)
                                         if df_window_score.loc[index_right,'common_score'] < 0:
                                             negative_count += 1
                                         all_count += 1
                                         index_left = index_left+1
-                                    else: # the case that expansion makes LOD score smaller than the threshold or both left_lod and right_lod are smaller than -3
+                                    else: # the case that expansion makes LLR score smaller than the threshold or both left_llr and right_llr are smaller than -3
                                         index_left = index_left+1
                                         index_right = index_right-1
                                         break
                         elif index_left <= 0 and index_right < len(df_window_score.index)-1:
                             index_right = index_right+1
-                            right_lod = df_window_score.loc[index_right,'LOD']
-                            new_lod = lod+right_lod
-                            if new_lod >= threshold and right_lod >= -5:
-                                lod = new_lod
+                            right_llr = df_window_score.loc[index_right,'LLR']
+                            new_llr = llr+right_llr
+                            if new_llr >= threshold and right_llr >= -5:
+                                llr = new_llr
                                 if df_window_score.loc[index_right,'common_score'] < 0:
                                     negative_count += 1
                                 all_count += 1
@@ -1495,10 +1495,10 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
                                 break
                         elif index_left > 0 and index_right >= len(df_window_score.index)-1:
                             index_left = index_left-1
-                            left_lod = df_window_score.loc[index_left,'LOD']
-                            new_lod = lod+left_lod
-                            if new_lod >= threshold and left_lod >= -5:
-                                lod = new_lod
+                            left_llr = df_window_score.loc[index_left,'LLR']
+                            new_llr = llr+left_llr
+                            if new_llr >= threshold and left_llr >= -5:
+                                llr = new_llr
                                 index_store_set.append(index_left)
                                 if df_window_score.loc[index_left,'common_score'] < 0:
                                     negative_count += 1
@@ -1513,9 +1513,9 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
                             index_left = index_left+1
                             index_right = index_right-1
                         else:
-                            lod = threshold-1 # we do not report this region as an IBD region
+                            llr = threshold-1 # we do not report this region as an IBD region
                         break
-                if lod >= threshold:
+                if llr >= threshold:
                     if index_left == 0:
                         previous_common_end_pos = common_map.iloc[windows_set[index_left][0],3]-1
                     else:
@@ -1613,11 +1613,11 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
         for i in range(len(index_set)):
             index = list(index_set)[i]
             if index not in index_store_set_non:
-                lod = df_window_score.loc[index,'LOD']
+                llr = df_window_score.loc[index,'LLR']
                 index_left = index
                 index_right = index
                 index_store_set_non.append(index)
-                while lod < threshold:
+                while llr < threshold:
                     region_start_cm_pos = common_map.iloc[windows_set[index_left][0],2]
                     region_end_cm_pos = common_map.iloc[windows_set[index_right][-1],2]
                     region_length = region_end_cm_pos-region_start_cm_pos
@@ -1625,23 +1625,23 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
                         if index_left > 0 and index_right < len(df_window_score.index)-1:
                             index_left = index_left-1
                             index_right = index_right+1
-                            left_lod = df_window_score.loc[index_left,'LOD']
-                            right_lod = df_window_score.loc[index_right,'LOD']
-                            new_lod = lod+left_lod+right_lod
-                            if new_lod < threshold:
-                                lod = new_lod
+                            left_llr = df_window_score.loc[index_left,'LLR']
+                            right_llr = df_window_score.loc[index_right,'LLR']
+                            new_llr = llr+left_llr+right_llr
+                            if new_llr < threshold:
+                                llr = new_llr
                                 index_store_set_non.append(index_left)
                                 index_store_set_non.append(index_right)
                             else:
-                                new_lod = lod+left_lod
-                                if new_lod < threshold:
-                                    lod = new_lod
+                                new_llr = llr+left_llr
+                                if new_llr < threshold:
+                                    llr = new_llr
                                     index_store_set_non.append(index_left)
                                     index_right = index_right-1 
                                 else:
-                                    new_lod = lod+right_lod
-                                    if new_lod < threshold:
-                                        lod = new_lod
+                                    new_llr = llr+right_llr
+                                    if new_llr < threshold:
+                                        llr = new_llr
                                         index_store_set_non.append(index_right)
                                         index_left = index_left+1
                                     else:
@@ -1650,20 +1650,20 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
                                         break
                         elif index_left <= 0 and index_right < len(df_window_score.index)-1:
                             index_right = index_right+1
-                            right_lod = df_window_score.loc[index_right,'LOD']
-                            new_lod = lod+right_lod
-                            if new_lod < threshold:
-                                lod = new_lod
+                            right_llr = df_window_score.loc[index_right,'LLR']
+                            new_llr = llr+right_llr
+                            if new_llr < threshold:
+                                llr = new_llr
                                 index_store_set_non.append(index_right)
                             else:
                                 index_right = index_right-1
                                 break
                         elif index_left > 0 and index_right >= len(df_window_score.index)-1:
                             index_left = index_left-1
-                            left_lod = df_window_score.loc[index_left,'LOD']
-                            new_lod = lod+left_lod
-                            if new_lod < threshold:
-                                lod = new_lod
+                            left_llr = df_window_score.loc[index_left,'LLR']
+                            new_llr = llr+left_llr
+                            if new_llr < threshold:
+                                llr = new_llr
                                 index_store_set_non.append(index_left)
                             else:
                                 index_left = index_left+1
@@ -1675,7 +1675,7 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
                             index_left = index_left+1
                             index_right = index_right-1
                         break
-                if lod < threshold:
+                if llr < threshold:
                     if index_left == 0:
                         previous_common_end_pos = common_map.iloc[windows_set[index_left][0],3]-1
                     else:
