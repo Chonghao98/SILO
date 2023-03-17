@@ -1,5 +1,5 @@
 # SILO
-SILO is an IBD detection method that is capable of identifying short IBD segments.
+**SILO** is a Python based commond line tool that identifies IBD segments. It could not only detect long IBD segments but also short IBD segments (length < 2 centimorgan) by incorporating low-frequency variants.
 ## Usage
 ```
 python3 run_SILO.py --winsize INT --length FLOAT --error_common FLOAT --error_lowf FLOAT --threshold FLOAT --mode STR --union INT  
@@ -36,8 +36,9 @@ required arguments
 ```
 
 ## Getting started
-Download the IBD_functions.py and run_SILO.py and put them in one folder. run_SILO.py will load the functions defined in IBD_functions.py.  
-Download the zipped file sample_data.zip and put it in the same folder with run_SILO.py. Unzip it and run the following command:
+- Download the IBD_functions.py and run_SILO.py and put them in one folder. run_SILO.py will load the functions defined in IBD_functions.py.  
+- SILO requires Python packages **scipy**, **numpy**, and **pandas**.
+- Download the zipped file sample_data.zip and put it in the same folder with run_SILO.py. Unzip it and run the following command:
 ```
 python3 run_SILO.py 
 --winsize 10  
