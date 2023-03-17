@@ -9,7 +9,6 @@ import scipy
 import math
 import sys
 import warnings
-from sklearn.mixture import GaussianMixture as GMM
 from scipy.stats import norm 
 
 warnings.filterwarnings("error")
