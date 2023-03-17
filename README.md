@@ -60,6 +60,7 @@ Common variants of the testing set: .tped, .tfam
 Low frequency variants of the training set: .map, .frq, .frq.counts  
 Low frequency variants of the testing set: .tped  
 All file formats except .hap could be found at https://www.cog-genomics.org/plink/2.0/formats#haps.  
+.hap, .tped, .tfam, .frq, .frq.counts are space-delimited, while .map is tab-delimited.  
 The file format of .hap is as follow:  
 ```
 haplotype1 haplotype2 haplotype3 haplotype4
