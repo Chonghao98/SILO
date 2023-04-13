@@ -63,7 +63,7 @@ All file formats except .hap could be found at https://www.cog-genomics.org/plin
 .hap, .tped, .tfam, .frq, .frq.counts are space-delimited, while .map is tab-delimited.  
 The file format of .hap is as follow:  
 ```
-haplotype1 haplotype2 haplotype3 haplotype4
+haplotype1.1 haplotype1.2 haplotype2.1 haplotype2.2
 1 0 0 1
 1 1 1 0
 0 0 -1 1
