@@ -1483,7 +1483,7 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
                             index_right = index_right+1
                             right_llr = df_window_score.loc[index_right,'LLR']
                             new_llr = llr+right_llr
-                            if new_llr >= threshold and right_llr >= -5:
+                            if new_llr >= threshold and right_llr >= -3:
                                 llr = new_llr
                                 if df_window_score.loc[index_right,'common_score'] < 0:
                                     negative_count += 1
@@ -1496,7 +1496,7 @@ def generate_IBD_region(df_block_score,df_window_score,windows_set,common_map,ra
                             index_left = index_left-1
                             left_llr = df_window_score.loc[index_left,'LLR']
                             new_llr = llr+left_llr
-                            if new_llr >= threshold and left_llr >= -5:
+                            if new_llr >= threshold and left_llr >= -3:
                                 llr = new_llr
                                 index_store_set.append(index_left)
                                 if df_window_score.loc[index_left,'common_score'] < 0:
