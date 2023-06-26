@@ -164,8 +164,9 @@ def encoding(tped,tfam,frq,judge,num_nodes):
         num_nodes = len(tfam.index)
     pool = multiprocessing.Pool(min(num_nodes,len(tfam.index)))
     num_samples = len(tfam.index) # the number of individuals in the test set
+    tped_copy = tped.copy()
     for j in range(num_samples):
-        tmp_dic[j] = pool.apply_async(tmp_encoding,(j,tped.copy(),frq,judge,))
+        tmp_dic[j] = pool.apply_async(tmp_encoding,(j,tped_copy,frq,judge,))
     pool.close()
     pool.join()
     list1 = []
